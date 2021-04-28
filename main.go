@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"Heterogenous_SRM/watcher"
+	"time"
+)
 
 func main() {
-	fmt.Println("Hello")
+	done := make(chan bool)
+	fileAccessMap := make(map[string][]time.Time)
+	go watcher.WatcherFunc("./test", fileAccessMap)
+	<-done
 }
