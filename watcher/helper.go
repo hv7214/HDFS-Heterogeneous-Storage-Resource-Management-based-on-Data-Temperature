@@ -27,5 +27,7 @@ func capTimeStampsForOneMonth(fileAccess map[string][]time.Time, filename string
 		}
 	}
 
+	mutex.Lock()
 	fileAccess[filename] = fileAccess[filename][ind:]
+	mutex.Unlock()
 }

@@ -2,10 +2,13 @@ package watcher
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 )
+
+var mutex = &sync.Mutex{}
 
 func WatcherFunc(path string, fileAccess map[string][]time.Time) {
 
@@ -18,10 +21,8 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time) {
 
 	dir := getDirName(path)
 
-	//
 	done := make(chan bool)
 
-	//
 	go func() {
 		for {
 			select {
@@ -40,9 +41,13 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time) {
 				if eventName == "OPEN" || eventName == "WRITE" || eventName == "CREATE" {
 					ts := time.Now()
 					if fileAccess[fileName] != nil {
+						mutex.Lock()
 						fileAccess[fileName] = append(fileAccess[fileName], ts)
+						mutex.Unlock()
 					} else {
+						mutex.Lock()
 						fileAccess[fileName] = []time.Time{ts}
+						mutex.Unlock()
 					}
 				}
 
