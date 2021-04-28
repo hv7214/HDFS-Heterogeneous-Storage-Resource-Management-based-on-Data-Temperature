@@ -30,9 +30,13 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time) {
 				eventName := event.Op.String()
 				dirfileName := event.Name
 				fileName := getFileName(dirfileName)
+
 				if fileName == dir {
 					continue
 				}
+
+				capTimeStampsForOneMonth(fileAccess, fileName)
+
 				if eventName == "OPEN" || eventName == "WRITE" || eventName == "CREATE" {
 					ts := time.Now()
 					if fileAccess[fileName] != nil {
