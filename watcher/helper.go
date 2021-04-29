@@ -3,6 +3,7 @@ package watcher
 import (
 	"strings"
 	"time"
+	"sync"
 )
 
 func getDirName(path string) string {
@@ -17,7 +18,7 @@ func getFileName(dirfileName string) string {
 	return fileName
 }
 
-func capTimeStampsForOneMonth(fileAccess map[string][]time.Time, filename string) {
+func capTimeStampsForOneMonth(fileAccess map[string][]time.Time, filename string, mutex *sync.Mutex) {
 	var ind int
 	monthMilliseconds := int64(2592000000)
 

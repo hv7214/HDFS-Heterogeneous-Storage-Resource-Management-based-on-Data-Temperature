@@ -8,9 +8,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-var mutex = &sync.Mutex{}
-
-func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[string]time.Time) {
+func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, mutex *sync.Mutex) {
 
 	// creates a new file watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -36,7 +34,7 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[str
 					continue
 				}
 
-				capTimeStampsForOneMonth(fileAccess, fileName)
+				capTimeStampsForOneMonth(fileAccess, fileName, mutex)
 
 				if eventName == "OPEN" || eventName == "WRITE" || eventName == "CREATE" {
 					ts := time.Now()
