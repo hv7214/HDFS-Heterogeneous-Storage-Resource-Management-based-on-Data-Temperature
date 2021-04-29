@@ -19,7 +19,7 @@ func getFileName(dirfileName string) string {
 
 func capTimeStampsForOneMonth(fileAccess map[string][]time.Time, filename string) {
 	var ind int
-	monthMilliseconds := int64(2629800000)
+	monthMilliseconds := int64(2592000000)
 
 	for ; ind < len(fileAccess[filename]); ind++ {
 		if time.Since(fileAccess[filename][ind]).Milliseconds() < monthMilliseconds {
