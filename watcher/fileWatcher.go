@@ -10,7 +10,7 @@ import (
 
 var mutex = &sync.Mutex{}
 
-func WatcherFunc(path string, fileAccess map[string][]time.Time) {
+func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[string]time.Time) {
 
 	// creates a new file watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -47,6 +47,7 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time) {
 					} else {
 						mutex.Lock()
 						fileAccess[fileName] = []time.Time{ts}
+						fileAge[fileName] = ts
 						mutex.Unlock()
 					}
 				}

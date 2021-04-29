@@ -8,6 +8,7 @@ import (
 func main() {
 	done := make(chan bool)
 	fileAccessMap := make(map[string][]time.Time)
-	go watcher.WatcherFunc("./test", fileAccessMap)
+	fileAge := make(map[string]time.Time)
+	go watcher.WatcherFunc("./test", fileAccessMap, fileAge)
 	<-done
 }
