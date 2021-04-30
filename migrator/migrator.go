@@ -20,7 +20,7 @@ var migrator_run_interval time.Duration = time.Hour
 func StartMigrator(storagePolicy map[string]string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, mutex *sync.Mutex) {
 	totalAccessInADay := 0
 
-	for _ = range time.Tick(migrator_run_interval) {
+	for range time.Tick(migrator_run_interval) {
 		// lock the mutex
 		mutex.Lock()
 		for filename, accessTimes := range fileAccess {
