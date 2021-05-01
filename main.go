@@ -17,7 +17,7 @@ func main() {
 
 	// start migrator and watcher
 	go migrator.StartMigrator(storagePolicy, fileAccessMap, fileAge, mutex)
-	go watcher.WatcherFunc("./test", fileAccessMap, fileAge, mutex)
+	go watcher.WatcherFunc("./test", fileAccessMap, fileAge, storagePolicy, mutex)
 
 	<-done
 }

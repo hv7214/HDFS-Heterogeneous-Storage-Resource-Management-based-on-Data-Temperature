@@ -18,7 +18,7 @@ var Temp_to_storage_policy map[string]string = map[string]string{
 var migrator_run_interval time.Duration = time.Hour
 
 func StartMigrator(storagePolicy map[string]string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, mutex *sync.Mutex) {
-	totalAccessInADay := 0
+	totalAccessInADay := 1
 
 	for range time.Tick(migrator_run_interval) {
 		// lock the mutex
@@ -30,8 +30,15 @@ func StartMigrator(storagePolicy map[string]string, fileAccess map[string][]time
 			totalAccessInADay += count_d
 			// get new temperature of the file
 			temperature := getTemperature(count_d, count_w, count_m, fileAge[filename])
-			// update the storage policy depending on the temperature
-			storagePolicy[filename] = Temp_to_storage_policy[temperature]
+			// get the new storage policy depending on the temperature
+			newStoragePolicy := Temp_to_storage_policy[temperature]
+			// if new storage policy is not same as before, invoke the mover
+			if newStoragePolicy != storagePolicy[filename] {
+				fmt.Println("Invoking mover: " + filename + " storage policy changed from " +
+					storagePolicy[filename] + " to " + newStoragePolicy)
+			}
+			// update the storage policy
+			storagePolicy[filename] = newStoragePolicy
 		}
 		// unlock the mutex
 		mutex.Unlock()

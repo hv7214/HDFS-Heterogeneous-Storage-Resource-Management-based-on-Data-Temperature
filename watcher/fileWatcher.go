@@ -8,7 +8,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, mutex *sync.Mutex) {
+func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, storagePolicy map[string]string, mutex *sync.Mutex) {
 
 	// creates a new file watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -58,6 +58,7 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[str
 						mutex.Lock()
 						fileAccess[fileName] = []time.Time{ts}
 						fileAge[fileName] = ts
+						storagePolicy[fileName] = "HOT"
 						mutex.Unlock()
 					}
 				}
