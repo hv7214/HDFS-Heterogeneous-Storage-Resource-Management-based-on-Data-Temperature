@@ -16,10 +16,10 @@ var Temp_to_storage_policy map[string]string = map[string]string{
 }
 
 // testing
-var migrator_run_interval time.Duration = time.Second
+// var migrator_run_interval time.Duration = time.Second
 
 // production
-// var migrator_run_interval time.Duration = time.Hour
+var migrator_run_interval time.Duration = time.Hour
 
 func StartMigrator(storagePolicy map[string]string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, mutex *sync.Mutex) {
 	totalAccessInADay := 1
