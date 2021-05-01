@@ -12,7 +12,7 @@ var Temp_to_storage_policy map[string]string = map[string]string{
 	"FALL":   "ONE_SSD",
 	"WINTER": "WARM",
 	"FROZEN": "COLD",
-	"N/A":    "HOT",
+	"N/A":    "LAZY PERSIST",
 }
 
 // testing
