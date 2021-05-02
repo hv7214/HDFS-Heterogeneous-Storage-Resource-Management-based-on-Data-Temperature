@@ -25,6 +25,8 @@ func StartMigrator() {
 	totalAccessInADay := 1
 	ticker := time.NewTicker(migrator_run_interval)
 
+	fmt.Println("[", time.Now().Format("2006-01-02 3:4:5 pm"), "] Migrator started....")
+
 	for {
 		select {
 		case <-ticker.C:
@@ -42,8 +44,9 @@ func StartMigrator() {
 				// if new storage policy is not same as before, invoke the mover
 				if newStoragePolicy != storagePolicy[filename] {
 					database.UpdatePolicy(filename, fileAccess[filename], newStoragePolicy)
-					fmt.Println("Invoking mover: " + filename + " storage policy changed from " +
-						storagePolicy[filename] + " to " + newStoragePolicy)
+					fmt.Println("[", time.Now().Format("2006-01-02 3:4:5 pm"),
+						"] Invoking mover: "+filename+" storage policy changed from "+
+							storagePolicy[filename]+" to "+newStoragePolicy)
 				}
 				// update the storage policy
 				storagePolicy[filename] = newStoragePolicy
