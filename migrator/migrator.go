@@ -19,7 +19,7 @@ var Temp_to_storage_policy map[string]string = map[string]string{
 // var migrator_run_interval time.Duration = time.Second
 
 // production
-var migrator_run_interval time.Duration = 5 * time.Second
+var migrator_run_interval time.Duration = time.Hour
 
 func StartMigrator() {
 	totalAccessInADay := 1
