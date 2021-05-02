@@ -1,9 +1,9 @@
 package migrator
 
 import (
+	"Heterogenous_SRM/database"
 	"fmt"
 	"math"
-	"sync"
 	"time"
 )
 
@@ -19,18 +19,17 @@ var Temp_to_storage_policy map[string]string = map[string]string{
 // var migrator_run_interval time.Duration = time.Second
 
 // production
-var migrator_run_interval time.Duration = time.Hour
+var migrator_run_interval time.Duration = 5 * time.Second
 
-func StartMigrator(storagePolicy map[string]string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, mutex *sync.Mutex) {
+func StartMigrator() {
 	totalAccessInADay := 1
 	ticker := time.NewTicker(migrator_run_interval)
 
 	for {
 		select {
 		case <-ticker.C:
-			fmt.Println("here")
-			// lock the mutex
-			mutex.Lock()
+			fileAccess, fileAge, storagePolicy := database.FetchFromDatabase()
+			capTimeStampsForOneMonth(fileAccess)
 			for filename, accessTimes := range fileAccess {
 				// get count metrics
 				count_d, count_w, count_m := getCountMetrics(accessTimes)
@@ -42,14 +41,13 @@ func StartMigrator(storagePolicy map[string]string, fileAccess map[string][]time
 				newStoragePolicy := Temp_to_storage_policy[temperature]
 				// if new storage policy is not same as before, invoke the mover
 				if newStoragePolicy != storagePolicy[filename] {
+					database.UpdatePolicy(filename, fileAccess[filename], newStoragePolicy)
 					fmt.Println("Invoking mover: " + filename + " storage policy changed from " +
 						storagePolicy[filename] + " to " + newStoragePolicy)
 				}
 				// update the storage policy
 				storagePolicy[filename] = newStoragePolicy
 			}
-			// unlock the mutex
-			mutex.Unlock()
 			// update the migrator run interval time by 24hrs/totalAccessInADay
 			timeTakenForOneAccess := fmt.Sprintf("%f", math.Min(float64((24*3600)/totalAccessInADay), 60)) + "s"
 			// update the migrator run interval value(it should not go beyond one minute)

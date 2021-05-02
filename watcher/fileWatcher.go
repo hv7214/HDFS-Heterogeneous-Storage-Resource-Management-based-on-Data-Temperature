@@ -2,13 +2,14 @@ package watcher
 
 import (
 	"fmt"
-	"sync"
 	"time"
+
+	"Heterogenous_SRM/database"
 
 	"github.com/fsnotify/fsnotify"
 )
 
-func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[string]time.Time, storagePolicy map[string]string, mutex *sync.Mutex) {
+func WatcherFunc(path string) {
 
 	// creates a new file watcher
 	watcher, err := fsnotify.NewWatcher()
@@ -46,24 +47,20 @@ func WatcherFunc(path string, fileAccess map[string][]time.Time, fileAge map[str
 					pass = 3
 				}
 
-				capTimeStampsForOneMonth(fileAccess, fileName, mutex)
+				// capTimeStampsForOneMonth(fileAccess, fileName, mutex)
 
 				if eventName == "OPEN" || eventName == "WRITE" || eventName == "CREATE" {
 					ts := time.Now()
-					if fileAccess[fileName] != nil {
-						mutex.Lock()
-						fileAccess[fileName] = append(fileAccess[fileName], ts)
-						mutex.Unlock()
+					flag, data := database.CheckExists(fileName)
+					if flag == true {
+						data = append(data, ts)
+						database.UpdateAccess(fileName, data)
 					} else {
-						mutex.Lock()
-						fileAccess[fileName] = []time.Time{ts}
-						fileAge[fileName] = ts
-						storagePolicy[fileName] = "HOT"
-						mutex.Unlock()
+						database.InsertAccessAndAge(fileName, ts, "HOT")
+						// storagePolicy[fileName] = "HOT"
 					}
 				}
 
-				// watch for errors
 			case err := <-watcher.Errors:
 				fmt.Println("ERROR", err)
 			}

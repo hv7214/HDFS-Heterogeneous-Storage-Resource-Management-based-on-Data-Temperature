@@ -1,6 +1,9 @@
 package migrator
 
-import "time"
+import (
+	"Heterogenous_SRM/database"
+	"time"
+)
 
 var dayMilliseconds int64 = int64(86400000)
 var weekMilliseconds int64 = int64(604800000)
@@ -31,7 +34,6 @@ func getCountMetrics(accessTimes []time.Time) (int, int, int) {
 func getTemperature(count_d int, count_m int, count_w int, age time.Time) string {
 	temperature := "N/A"
 	ageInMilliseconds := time.Since(age).Milliseconds()
-
 	if ageInMilliseconds < weekMilliseconds && count_d > 30 {
 		temperature = "SUMMER"
 	} else if ageInMilliseconds > weekMilliseconds && ageInMilliseconds < monthMilliseconds && count_d > 15 && count_w > 30 {
@@ -43,4 +45,21 @@ func getTemperature(count_d int, count_m int, count_w int, age time.Time) string
 	}
 
 	return temperature
+}
+
+func capTimeStampsForOneMonth(fileAccess map[string][]time.Time) {
+	var ind int
+	monthMilliseconds := int64(2592000000)
+
+	for filename := range fileAccess {
+		for ind = 0; ind < len(fileAccess[filename]); ind++ {
+			if time.Since(fileAccess[filename][ind]).Milliseconds() < monthMilliseconds {
+				break
+			}
+		}
+		fileAccess[filename] = fileAccess[filename][ind:]
+		if ind > 0 {
+			database.UpdateAccess(filename, fileAccess[filename])
+		}
+	}
 }
